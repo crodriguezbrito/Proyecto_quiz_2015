@@ -7,16 +7,16 @@ exports.index = function(req, res) {
   })
 };
 
-// GET /quizes/:id
+// GET /quizes/:id //cambio de .find por .findById me salía error de que con find no se podía pasar un solo argumento si no que se necesitaba poner findById 
 exports.show = function(req, res) {
-  models.Quiz.find(req.params.quizId).then(function(quiz) {
+  models.Quiz.findById(req.params.quizId).then(function(quiz) {
     res.render('quizes/show', { quiz: quiz});
   })
 };
 
 // GET /quizes/:id/answer
 exports.answer = function(req, res) {
-  models.Quiz.find(req.params.quizId).then(function(quiz) {
+  models.Quiz.findById(req.params.quizId).then(function(quiz) {
     if (req.query.respuesta === quiz.respuesta) {
       res.render('quizes/answer', 
                  { quiz: quiz, respuesta: 'Correcto' });
