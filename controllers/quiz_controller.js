@@ -12,14 +12,28 @@ exports.load = function(req, res, next, quizId) {
   ).catch(function(error) { next(error);});
 };
 
+
 // GET /quizes
 exports.index = function(req, res) {
-  models.Quiz.findAll().then(
-    function(quizes) {
-      res.render('quizes/index', { quizes: quizes});
-    }
-  ).catch(function(error) { next(error);})
+	if (req.query.search) { //si en /quizes le hemos dado al botón buscar pregunta irá por aquí
+		var busqueda = ('%' + req.query.search + '%').replace(/ /g, '%');  //No olvide delimitar el string contenido en search con el comodín % antes y después y cambie también los espacios en blanco por %. 
+		models.Quiz.findAll({  // a la bbdd le pasamos que busque resultados que coincidan con la busqueda
+			where: ["pregunta like ?", busqueda],
+			order: 'pregunta ASC' // y lo ordene de modo ascendente
+		}).then(function(quizes) {
+			res.render('quizes/index', {quizes: quizes});
+		}
+		).catch(function(error) { next(error);})
+	}
+	else { 
+		models.Quiz.findAll().then(function(quizes) {
+			res.render('quizes/index', {quizes: quizes});
+		}
+		).catch(function(error) { next(error);})
+	}
 };
+
+
 
 // GET /quizes/:id
 exports.show = function(req, res) {
