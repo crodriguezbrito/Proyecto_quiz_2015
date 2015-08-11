@@ -43,7 +43,23 @@ app.use(function(req, res, next) {
     next();
 });
 
-
+//Middleware auto-logout de sesion
+app.use(function(req, res, next) {
+    if(req.session.user){//Si existe la sesion de usuario hacemos la marca del tiempo de sesion
+        if(req.session.tiemposesion){//Si se ha creado un tiempo de sesion
+            if((new Date()).getTime()-req.session.tiemposesion > 120000){//comprobamos si el tiempo actual y el de sesion es mayor a 2 min (2min=120000ms), si es asi destruimos la sesion de usuario
+                delete req.session.user;     //eliminamos el usuario
+                delete req.session.tiemposesion;    //eliminamos la marca de tiempo de sesion
+                console.log("sesion caducada");
+            }else{//si no es superior a 2 minutos se coge el tiempo actual como nuevo tiempo de sesion  
+                req.session.tiemposesion=(new Date()).getTime();
+            }
+        }else{ //si no se a creado la variable tiempo sesion se crea en este paso (Primer tiempo de sesion cogido cuando un usuario se loguea)
+            req.session.tiemposesion=(new Date()).getTime();
+        }
+    }
+    next();
+});
 
 app.use('/', routes);
 
